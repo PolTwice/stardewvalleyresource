@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'homePage.dart';
-import 'package:stardewvalleyresource/supabasetest.dart';
+import 'villagers.dart';
 
-const Color stardewDarkBrown = Color(0xFF52180E); // Icons and labels
-const Color stardewMediumBrown = Color(0xFFEE961E); // AppBar and NavBar background
-const Color stardewTanBody = Color(0xFFF8D387); // Main content background
+const Color stardewDarkBrown = Color(0xFF52180E);
+const Color stardewMediumBrown = Color(0xFFEE961E);
+const Color stardewTanBody = Color(0xFFF8D387);
 const Color stardewShadow = Color(0xFFE1A363);
+const Color stardewBorderLight = Color(0xFFE1A363);
+
 
 Future<void> main() async {
-  // Ensure Flutter is ready before calling Supabase
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
@@ -24,16 +25,15 @@ Future<void> main() async {
           theme: ThemeData(
             fontFamily: 'StardewFont',
             useMaterial3: true,
+            appBarTheme: const AppBarTheme(surfaceTintColor: Colors.transparent),
           ),
           home: const StardewOutline()
       )
   );
 }
 
-// Quick access to the Supabase client
 final supabase = Supabase.instance.client;
 
-//
 class StardewOutline extends StatefulWidget {
   const StardewOutline({super.key});
 
@@ -42,91 +42,90 @@ class StardewOutline extends StatefulWidget {
 }
 
 class _StardewOutlineState extends State<StardewOutline> {
-  // Track the currently selected tab
-  int _selectedIndex = 0;
+  // Set the initial index to 2 (Our "Hidden" Home index)
+  int _selectedIndex = 2;
 
-  // List of unique pages for each tab (we will build these later)
-  static List<Widget> _pages = <Widget>[
-    HomePage(),
-    Center(child: Text('Villagers Data will load here', style: TextStyle(color: Color(0xFF52180E)))),
-    Center(child: Text('Community Centre Data will load here', style: TextStyle(color: Color(0xFF52180E)))),
-  ];
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
-  // Function to handle tab taps
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+    // Resets the inner stack whenever a tab is clicked
+    _navigatorKey.currentState?.popUntil((route) => route.isFirst);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Defines the precise colors from your format image
-
-
     return Scaffold(
-      backgroundColor: stardewTanBody, // Matches the large tan area
-
-      // 1. TOP APP BAR (The thin brown header)
-      appBar: AppBar(
-        title: Text("Pelican Pass"),
-        backgroundColor: stardewMediumBrown,
-        shadowColor: stardewShadow,
-        elevation: 4,
-        shape:
-            const Border(
-              bottom: BorderSide(
-                color: stardewDarkBrown,
-                width: 4
-              )
+      backgroundColor: stardewTanBody,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight + 4),
+        child: Container(
+          decoration: const BoxDecoration(
+            //bottom decoration
+            border: Border(bottom: BorderSide(color: stardewShadow, width: 4)),
+          ),
+          child: AppBar(
+            title: GestureDetector(
+              // 2. Clicking Title sets index to 2 (Home)
+              onTap: () => _onItemTapped(2),
+              child: const Text(
+                  "Pelican Pass",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: stardewDarkBrown)
+              ),
             ),
-
-        // The burger menu icon
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          color: stardewDarkBrown,
-          onPressed: () {
-            // Add drawer functionality here later if needed
-          },
+            backgroundColor: stardewMediumBrown,
+            elevation: 0,
+            shape: const Border(bottom: BorderSide(color: stardewDarkBrown, width: 4)),
+            leading: IconButton(
+              icon: const Icon(Icons.menu, color: stardewDarkBrown),
+              onPressed: () {},
+            ),
+          ),
         ),
       ),
 
-      // 2. MAIN BODY (Shows the selected page content)
-      body: _pages[_selectedIndex],
 
-      // 3. BOTTOM NAVIGATION BAR (The brown footer)
+      body: Navigator(
+        // Use ValueKey so the Navigator resets when you switch tabs or click the Title
+        key: ValueKey(_selectedIndex),
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            builder: (context) {
+              switch (_selectedIndex) {
+                case 0:
+                  return VillagersPage();
+                case 1:
+                  return const Center(child: Text('Community Centre Tracker'));
+                case 2:
+                default:
+                  return HomePage();
+              }
+            },);
+        },),
+
       bottomNavigationBar: Container(
-        // The container provides the background color and the top border line
         decoration: const BoxDecoration(
           color: stardewMediumBrown,
-          border: Border(
-            top: BorderSide(color: stardewDarkBrown, width: 2.0), // The dark line separator
-          ),
+          border: Border(top: BorderSide(color: stardewDarkBrown, width: 4.0)),
         ),
         child: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
-            // Villagers Tab (using person icon)
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Villagers',
-            ),
-            // Community Centre Tab (using house icon)
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Community Centre',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Villagers'),
+            BottomNavigationBarItem(icon: Icon(Icons.account_balance_sharp), label: 'Centre'),
           ],
-          currentIndex: _selectedIndex,
+          currentIndex: _selectedIndex > 1 ? 0 : _selectedIndex,
+          // Hide highlighing if on Home page
+          selectedItemColor: _selectedIndex > 1 ? stardewDarkBrown.withAlpha(200) : stardewDarkBrown,
           onTap: _onItemTapped,
-          // Customizing the colors and style to match the format
-          backgroundColor: Colors.transparent, // Uses the Container's color
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.transparent,
           elevation: 0,
-          selectedItemColor: stardewDarkBrown, // Color when active
-          unselectedItemColor: stardewDarkBrown.withOpacity(0.8), // Slightly faded when inactive
+          unselectedItemColor: stardewDarkBrown.withAlpha(200),
           showUnselectedLabels: true,
-          // Pixel-style text formatting
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
         ),
       ),
     );
