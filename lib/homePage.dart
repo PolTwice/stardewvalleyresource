@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'main.dart';
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+
+    final user = Supabase.instance.client.auth.currentUser;
+
+    final String displayName = user?.userMetadata?['username'] ??
+        user?.email?.split('@')[0] ??
+        "Farmer";
+
     return Scaffold(
       backgroundColor: stardewTanBody,
       body: SingleChildScrollView(
@@ -14,52 +21,47 @@ class HomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "Welcome Farmer!",
+              "Welcome, $displayName!",
               style: TextStyle(
-                fontSize: screenWidth * .1,
-                fontWeight: FontWeight.bold
-              )
+                color: stardewDarkBrown,
+                fontSize: (screenWidth * .08).clamp(24, 60),
+                fontWeight: FontWeight.bold,
+              ),
             ),
+            const SizedBox(height: 20),
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start, // Aligns text and gif to the top
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. WRAP YOUR TEXT IN EXPANDED
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Welcome to Pelican Pass! We have Two features currently:\n"
-                        " \"Villagers\" lets you look at the villager's gift preferences\n"
-                        " \"Community\" center gives you a checklist for each bundle in the community center\n",
+                        "Welcome to Pelican Pass! We have two features currently:\n\n"
+                            "• \"Villagers\" lets you look at the villager's gift preferences\n"
+                            "• \"Community Center\" gives you a checklist for each bundle\n",
                         style: TextStyle(
-                          fontSize: screenWidth * .03
-                      )
+                          color: stardewDarkBrown,
+                          fontSize: (screenWidth * .04).clamp(12, 18),
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(width: 16), // A little breathing room
-
-                // 2. THE GIF (With a set size)
+                    ], // End of Column children
+                  ), // End of Column
+                ), // End of Expanded
+                const SizedBox(width: 16),
                 SizedBox(
-                  width: 100, // Explicit size keeps the GIF from taking over
+                  width: 100,
                   height: 100,
                   child: Image.network(
-                    'https://media1.tenor.com/m/dsAkCR4X4V0AAAAC/junimo-stardew.gif', // Direct GIF link
-                    height: 50,
-                    width: 50,
+                    'https://media1.tenor.com/m/dsAkCR4X4V0AAAAC/junimo-stardew.gif',
                     fit: BoxFit.contain,
                   ),
                 ),
-              ],
-            )
-
-          ]
-      )
-      )
+              ], // End of Row children
+            ), // End of Row
+          ], // End of Column children
+        ), // End of Column
+      ), // End of SingleChildScrollView
     );
   }
-
 }

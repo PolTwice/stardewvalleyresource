@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'main.dart';
+
 class VillagerDetailPage extends StatefulWidget {
   final Map<String, dynamic> villager; // Pass the villager data from the grid
 
@@ -50,13 +52,27 @@ class _VillagerDetailPageState extends State<VillagerDetailPage> {
       backgroundColor: const Color(0xFFF8D387), // stardewTanBody
       appBar: AppBar(
         title: Text(widget.villager['VillagerName']),
-        backgroundColor: const Color(0xFFEE961E),
+        backgroundColor: stardewShadow,
         foregroundColor: stardewDarkBrown,
       ),
       body: FutureBuilder<Map<String, List<Map<String, dynamic>>>>(
         future: _allPreferences,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+          // 1. Check for errors first!
+          if (snapshot.hasError) {
+            print("Supabase Error: ${snapshot.error}"); // Check your Debug Console!
+            return Center(child: Text("Error: ${snapshot.error}", style: TextStyle(color: Colors.red)));
+          }
+
+          // 2. Check if it's still loading
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // 3. Only now check for data
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text("No preferences found."));
+          }
 
           final prefs = snapshot.data!;
 
