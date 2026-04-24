@@ -46,10 +46,8 @@ class _VillagerDetailPageState extends State<VillagerDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    const Color stardewDarkBrown = Color(0xFF52180E);
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF8D387), // stardewTanBody
+      backgroundColor: stardewTanBody, // stardewTanBody
       appBar: AppBar(
         title: Text(widget.villager['VillagerName']),
         backgroundColor: stardewShadow,
@@ -112,7 +110,7 @@ class _VillagerDetailPageState extends State<VillagerDetailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: labelColor)),
-        const Divider(color: Color(0xFF52180E), thickness: 2),
+        const Divider(color: stardewDarkBrown, thickness: 2),
         GridView.builder(
           shrinkWrap: true, // Crucial: allows Grid inside ListView
           physics: const NeverScrollableScrollPhysics(), // ListView handles scrolling
@@ -131,8 +129,8 @@ class _VillagerDetailPageState extends State<VillagerDetailPage> {
               message: item['Item'], // Shows name on long-press
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFF52180E)),
-                  color: const Color(0xFFE1A363),
+                  border: Border.all(color: stardewDarkBrown),
+                  color: stardewTanBody,
                 ),
                 child: Image.network(itemImg),
               ),
