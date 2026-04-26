@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'authentication.dart';
 import 'homePage.dart';
 import 'villagers.dart';
+import 'communityCenter.dart';
 
 const Color stardewDarkBrown = Color(0xFF52180E);
 const Color stardewMediumBrown = Color(0xFFEE961E);
@@ -116,7 +117,7 @@ class _StardewOutlineState extends State<StardewOutline> {
                 case 0:
                   return const VillagersPage();
                 case 1:
-                  return const Center(child: Text('Community Centre Tracker'));
+                  return const CommunityCenterPage();
                 case 2:
                   return HomePage();
                 case 3:
