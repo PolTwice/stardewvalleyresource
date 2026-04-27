@@ -28,7 +28,12 @@ class _AuthPageState extends State<AuthPage> {
         );
         //if the user is still on this page, go back
         if (mounted) {
-          Navigator.of(context).pop;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Login Successful!"),
+              backgroundColor: Colors.green,
+            ),
+          );
         }
       } else {
         // Register logic
