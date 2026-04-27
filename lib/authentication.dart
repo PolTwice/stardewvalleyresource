@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'main.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -16,40 +16,33 @@ class _AuthPageState extends State<AuthPage> {
   final _usernameController = TextEditingController(); // Optional metadata
   bool _isLoading = false;
 
-  final Color stardewDarkBrown = const Color(0xFF52180E);
-  final Color stardewButtonTan = const Color(0xFFF8D387);
-  final Color stardewFormBg = const Color(0xFFE1A363).withOpacity(0.5);
 
   Future<void> _handleAuth() async {
     setState(() => _isLoading = true);
     try {
-      // Inside AuthPage's _handleAuth function
+      // Login Logic
       if (_isLogin) {
-        await Supabase.instance.client.auth.signInWithPassword(
+        await supabase.auth.signInWithPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-
-        // Instead of a Navigator.push (which creates a new screen),
-        // you can just pop back to the base route if you called this as a sub-page,
-        // OR use a callback to change the _selectedIndex in StardewOutline.
+        //if the user is still on this page, go back
         if (mounted) {
-          // If you want to force the whole app to refresh and land on Villagers (index 0)
-          Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+          Navigator.of(context).pop;
         }
       } else {
-        // 2. REGISTER LOGIC
+        // Register logic
         if (_passwordController.text != _confirmPasswordController.text) {
           throw Exception("Passwords do not match!");
         }
 
-        await Supabase.instance.client.auth.signUp(
+        await supabase.auth.signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
           data: {'username': _usernameController.text.trim()},
         );
 
-        // SUCCESS: Show a message and switch to the Login view
+        // Show a message and switch to the Login view
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -78,14 +71,14 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8D387), // stardewTanBody
+      backgroundColor: stardewTanBody,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFFEE961E).withOpacity(0.4), // Card background
+              color: stardewShadow, // Card background
               border: Border.all(color: stardewDarkBrown, width: 3),
             ),
             child: Column(
@@ -100,6 +93,7 @@ class _AuthPageState extends State<AuthPage> {
                 // INPUT FIELDS
                 _buildSTextField("Email", _emailController),
                 const SizedBox(height: 15),
+                //spread operator for spreading fields into the list
                 if (!_isLogin) ...[
                   _buildSTextField("Username", _usernameController),
                   const SizedBox(height: 15),
@@ -112,25 +106,35 @@ class _AuthPageState extends State<AuthPage> {
 
                 const SizedBox(height: 25),
 
-                // AUTH BUTTON
-                _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
+                // Auth button
+                _isLoading ? const CircularProgressIndicator() : ElevatedButton(
                   onPressed: _handleAuth,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFEE961E),
                     side: BorderSide(color: stardewDarkBrown, width: 2),
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                   ),
-                  child: Text(_isLogin ? "Sign In" : "Register", style: TextStyle(color: stardewDarkBrown)),
+                  child: Text(
+                      _isLogin ? "Sign In" : "Register",
+                      style: TextStyle(color: stardewDarkBrown)),
                 ),
 
-                // TOGGLE TEXT
+                // login or register
                 TextButton(
                   onPressed: () => setState(() => _isLogin = !_isLogin),
                   child: Text(
                     _isLogin ? "Register Here" : "Login Here",
-                    style: const TextStyle(color: Colors.blueAccent),
+                    style: TextStyle(
+                      color: Colors.blue,
+                      shadows: [
+                        Shadow(color: Colors.grey, offset: Offset(2, 2))
+                      ],
+                      // decoration: TextDecoration.underline,
+                      // decorationColor: Colors.blue,
+                      // decorationThickness: 3,
+                      fontSize: 20
+                    ),
+
                   ),
                 ),
               ],
@@ -141,6 +145,7 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
+  //helper function for building fields
   Widget _buildSTextField(String label, TextEditingController controller, {bool obscure = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,7 +157,7 @@ class _AuthPageState extends State<AuthPage> {
           obscureText: obscure,
           decoration: InputDecoration(
             filled: true,
-            fillColor: stardewButtonTan,
+            fillColor: stardewTanBody,
             enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: stardewDarkBrown, width: 2)),
             focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: stardewDarkBrown, width: 3)),
             contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

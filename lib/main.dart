@@ -5,6 +5,7 @@ import 'homePage.dart';
 import 'villagers.dart';
 import 'communityCenter.dart';
 
+const Color stardewHighlighted = Color(0xFFA13219);
 const Color stardewDarkBrown = Color(0xFF52180E);
 const Color stardewMediumBrown = Color(0xFFEE961E);
 const Color stardewTanBody = Color(0xFFF8D387);
@@ -38,8 +39,10 @@ Future<void> main() async {
   );
 }
 
+//supabase instance
 final supabase = Supabase.instance.client;
 
+//Outline that can be changed as needed
 class StardewOutline extends StatefulWidget {
   const StardewOutline({super.key});
 
@@ -48,16 +51,20 @@ class StardewOutline extends StatefulWidget {
 }
 
 class _StardewOutlineState extends State<StardewOutline> {
-  // Set the initial index to 2 (Our "Hidden" Home index)
+  // index starts at 2 which is the homepage
   int _selectedIndex = 2;
 
+  //key to this navigator
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    // Resets the inner stack whenever a tab is clicked
+
+    // ensures the stack is empty when we go back to that page
     _navigatorKey.currentState?.popUntil((route) => route.isFirst);
   }
 
@@ -66,12 +73,15 @@ class _StardewOutlineState extends State<StardewOutline> {
     return Scaffold(
       backgroundColor: stardewTanBody,
       appBar: PreferredSize(
+        //make the appbar a bit bigger for the decoration border
         preferredSize: const Size.fromHeight(kToolbarHeight + 4),
         child: Container(
+          //border for the app bar
           decoration: const BoxDecoration(
             border: Border(bottom: BorderSide(color: stardewShadow, width: 4)),
           ),
           child: AppBar(
+            //allows for clicking of the title
             title: GestureDetector(
               onTap: () => _onItemTapped(2), // Home
               child: const Text(
@@ -82,37 +92,38 @@ class _StardewOutlineState extends State<StardewOutline> {
             backgroundColor: stardewMediumBrown,
             elevation: 0,
             shape: const Border(bottom: BorderSide(color: stardewDarkBrown, width: 4)),
-            // Inside your StardewOutline build method
+            //login action
             actions: [
-              IconButton(
+              TextButton.icon(
                 onPressed: () async {
-                  if (Supabase.instance.client.auth.currentUser != null) {
-                    // Log out if already logged in
-                    await Supabase.instance.client.auth.signOut();
-                    _onItemTapped(2); // Go back to Home
+                  if (supabase.auth.currentUser != null) {
+                    await supabase.auth.signOut(); //logout
+                    _onItemTapped(2); //go back to home
                   } else {
-                    _onItemTapped(3); // Go to Auth Page
+                    _onItemTapped(3); // go to login
                   }
                 },
                 icon: Icon(
-                  // Change icon based on auth state
-                  Supabase.instance.client.auth.currentUser != null
-                      ? Icons.logout
-                      : Icons.login_outlined,
+                  supabase.auth.currentUser != null ? Icons.logout : Icons.login,
                   color: stardewDarkBrown,
                 ),
-              )
+                label: Text(
+                  supabase.auth.currentUser != null ? "Logout" : "Login",
+                  style: const TextStyle(color: stardewDarkBrown, fontWeight: FontWeight.bold),
+                ),
+              ),
             ],
           ),
         ),
       ),
 
+      //navigator that holds page
       body: Navigator(
-        key: ValueKey(_selectedIndex),
+        key: ValueKey(_selectedIndex),  //everytime we navigate, it goes to a new instance
+        //check which route to run
         onGenerateRoute: (RouteSettings settings) {
           return MaterialPageRoute(
             builder: (context) {
-              // 2. Updated Switch Logic to include AuthPage
               switch (_selectedIndex) {
                 case 0:
                   return const VillagersPage();
@@ -121,7 +132,7 @@ class _StardewOutlineState extends State<StardewOutline> {
                 case 2:
                   return HomePage();
                 case 3:
-                  return const AuthPage(); // Your login/register widget
+                  return const AuthPage();
                 default:
                   return HomePage();
               }
@@ -140,15 +151,17 @@ class _StardewOutlineState extends State<StardewOutline> {
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Villagers'),
             BottomNavigationBarItem(icon: Icon(Icons.account_balance_sharp), label: 'Centre'),
           ],
-          // 3. Prevent the bar from highlighting an item if on Home (2) or Auth (3)
+
+          //trick the nav bar to look like nothing is selected when we are on the home or auth pages
           currentIndex: _selectedIndex > 1 ? 0 : _selectedIndex,
-          selectedItemColor: _selectedIndex > 1 ? stardewDarkBrown.withAlpha(200) : stardewDarkBrown,
+          selectedItemColor: _selectedIndex >1 ? stardewDarkBrown.withAlpha(200) : stardewHighlighted,
+          unselectedItemColor: stardewDarkBrown.withAlpha(200),
+          showUnselectedLabels: true,
           onTap: _onItemTapped,
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          unselectedItemColor: stardewDarkBrown.withAlpha(200),
-          showUnselectedLabels: true,
+
         ),
       ),
     );

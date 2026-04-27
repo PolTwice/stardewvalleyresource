@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'main.dart';
 
 class HomePage extends StatelessWidget {
@@ -7,8 +6,9 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
-    final user = Supabase.instance.client.auth.currentUser;
+    final user = supabase.auth.currentUser;
 
+    //get username else set to first part of email, else set to farmer
     final String displayName = user?.userMetadata?['username'] ??
         user?.email?.split('@')[0] ??
         "Farmer";
@@ -33,13 +33,16 @@ class HomePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
+                  flex: 2,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         "Welcome to Pelican Pass! We have two features currently:\n\n"
-                            "• \"Villagers\" lets you look at the villager's gift preferences\n"
-                            "• \"Community Center\" gives you a checklist for each bundle\n",
+                            "Villagers\n"
+                            " • This lets you look at the villager's gift preferences. \n\n"
+                            "Community Center\n"
+                            " • This gives you a checklist for each bundle. Make sure to make an account to save your checklists! \n",
                         style: TextStyle(
                           color: stardewDarkBrown,
                           fontSize: (screenWidth * .04).clamp(12, 18),
@@ -47,15 +50,13 @@ class HomePage extends StatelessWidget {
                       ),
                     ], // End of Column children
                   ), // End of Column
-                ), // End of Expanded
-                const SizedBox(width: 16),
-                SizedBox(
-                  width: 100,
-                  height: 100,
+                ),
+                const SizedBox(width: 16),  //spacer
+                Expanded(
                   child: Image.network(
-                    'https://media1.tenor.com/m/dsAkCR4X4V0AAAAC/junimo-stardew.gif',
-                    fit: BoxFit.contain,
-                  ),
+                      'https://media1.tenor.com/m/dsAkCR4X4V0AAAAC/junimo-stardew.gif',
+                      fit: BoxFit.contain,
+                    ),
                 ),
               ], // End of Row children
             ), // End of Row

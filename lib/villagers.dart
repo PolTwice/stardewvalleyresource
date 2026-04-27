@@ -12,19 +12,20 @@ class VillagersPage extends StatefulWidget {
 }
 
 class _VillagersPageState extends State<VillagersPage> {
-  // 1. Create the Future to fetch data from your 'Villagers' table
+  // future for getting data from the vilager table
   late Future<List<Map<String, dynamic>>> _villagersFuture;
 
   @override
   void initState() {
     super.initState();
-    // Querying the database - make sure 'VillagerName' and 'image_url' match your Supabase columns
+    //get villager list
     _villagersFuture = Supabase.instance.client
         .from('Villagers')
         .select()
         .order('VillagerName', ascending: true);
   }
 
+  //function for building villager icons
   Widget _buildVillagerCard({
     required String name,
     required String imageUrl,
@@ -34,8 +35,9 @@ class _VillagersPageState extends State<VillagersPage> {
       onTap: onTap,
       child: Column(
         children: [
+          //picture
           AspectRatio(
-            aspectRatio: 1, // 1.0 makes it a perfect square
+            aspectRatio: 1, // square
             child: Container(
               decoration: BoxDecoration(
                 color: stardewBorderLight,
@@ -57,6 +59,7 @@ class _VillagersPageState extends State<VillagersPage> {
             ),
           ),
 
+          //text
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
@@ -81,14 +84,14 @@ class _VillagersPageState extends State<VillagersPage> {
       backgroundColor: Colors.transparent, // Background is handled by StardewOutline
       body: Column(
         children: [
-          // TITLE SECTION
+          // Title
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Text(
               "Pelican Town Villagers",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: screenWidth*0.08,
+                fontSize: (screenWidth * .08).clamp(24, 60),
                 fontWeight: FontWeight.bold,
                 color: stardewDarkBrown,
                 height: 1.2,
@@ -96,40 +99,47 @@ class _VillagersPageState extends State<VillagersPage> {
             ),
           ),
 
-          // THE GRID
+          // grid of villagers
           Expanded(
+            //for getting info from databse
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: _villagersFuture,
               builder: (context, snapshot) {
+                //if we are still waiting for connection
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator(color: stardewDarkBrown));
                 }
+                //if there is an eror when connecting
                 if (snapshot.hasError) {
                   return Center(child: Text("Error: ${snapshot.error}"));
                 }
+                //we get the datam or we get an empty array if null
                 final villagers = snapshot.data ?? [];
 
                 return GridView.builder(
                   padding: const EdgeInsets.all(20),
+                  //we have a smart grid
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 200, // The "Maximum Size" for each card
+                    maxCrossAxisExtent: 200, // max size for each card
                     crossAxisSpacing: 15,
                     mainAxisSpacing: 20,
                     childAspectRatio: 0.75, // Keeps the vertical height proportional
                   ),
                   itemCount: villagers.length,
+
+                  //build villager entries
                   itemBuilder: (context, index) {
                     final villager = villagers[index];
                     return _buildVillagerCard(
                       name: villager['VillagerName'] ?? 'Unknown',
                       imageUrl: villager['imageURL'] ?? '',
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => VillagerDetailPage(villager: villager),
-                            ),
-                          );
-                        }
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => VillagerDetailPage(villager: villager),
+                          ),
+                        );
+                      }
                     );
                   },
                 );
