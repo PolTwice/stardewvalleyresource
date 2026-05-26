@@ -1,16 +1,18 @@
-# stardewvalleyresource
+# Pelican Pass
+Pelican Pass is a companion app and quick reference tool for Stardew Valley. 
+It was built as a hands-on project to explore mobile development using Flutter and backend integration with Supabase.
 
-A new Flutter project.
+##🚀 Features
+Villager Guide: A complete list of all Pelican Town villagers along with their specific gift preferences (loved, liked, etc.).
+Community Center Tracker: A comprehensive checklist for tracking your Community Center bundles.
+Cloud Sync: Your checklist progress automatically saves to your account so you never lose track of your farm's goals.
 
-## Getting Started
+##🛠️ Tech Stack
+Frontend: Flutter (Dart)
+Backend & Authentication: Supabase (PostgreSQL)
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+##📌 Getting Started
+Prerequisites
+Before running the project, make sure you have the following installed:
+ - Flutter SDK
+ - A Supabase account and project setup
