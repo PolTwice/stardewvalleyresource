@@ -11,8 +11,3 @@ Cloud Sync: Your checklist progress automatically saves to your account so you n
 Frontend: Flutter (Dart)
 Backend & Authentication: Supabase (PostgreSQL)
 
-## Getting Started 📌
-Prerequisites
-Before running the project, make sure you have the following installed:
- - Flutter SDK
- - A Supabase account and project setup
